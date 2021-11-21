@@ -35,27 +35,30 @@
 
 
 WindowManager:
+    Default:
+
     LogInScreen:
 
     MenuScreen:
+
+    ProfileScreen:
+    EditProfileScreen:
 
     DriverScreen:
     DriverWNRScreen:
     DriverVPScreen:
     DriverPPScreen:
+    RiderProfileScreen:
 
     RiderWNRScreen:
     RiderWaitScreen:
     RiderPScreen:
     RiderEndRScreen:
 
-    ProfileScreen:
 
-    RiderProfileScreen:
 
-    EditProfileScreen:
 
-    Default:
+
 
 <LogInScreen>:
     name:"logIn"
@@ -162,7 +165,8 @@ WindowManager:
         width:115
         height:80
         pos_hint:{"center_x":0.8,"center_y":0.1}
-        on_press:root.manager.current="ridernoride"
+        on_press:
+            root.checkSearch()
 
 <DriverScreen>:
     name: "conductor"
@@ -211,7 +215,7 @@ WindowManager:
     name:"ridernoride"
 
     Label:
-        text:"Busca tu viaje cuando estes\nen la parada.Si deseas,\n puedes escribir\nalgun comentario al conductor."
+        text:"Selecciona el boton con\nla opcion de busqueda\nque prefieras"
         multiline:True
         pos_hint:{"center_x":0.5,"center_y":0.75}
         font_size:25
@@ -227,10 +231,23 @@ WindowManager:
         width:250
         height:150
     Button:
-        text:"BUSCAR"
-        on_press:root.manager.current="waitingfordriver"
+        text:"Ubicacion Predeterminada"
+        on_press:
+            root.paradaP()
+            root.manager.current="waitingfordriver"
         font_size:20
         pos_hint:{"center_x":0.5,"center_y":0.2}
+        size_hint_x:None
+        size_hint_y:None
+        width:300
+        height:50
+    Button:
+        text:"Ubicacion actual"
+        on_press:
+            root.paradaA()
+            root.manager.current="waitingfordriver"
+        font_size:20
+        pos_hint:{"center_x":0.5,"center_y":0.1}
         size_hint_x:None
         size_hint_y:None
         width:300
@@ -253,7 +270,9 @@ WindowManager:
         font_size:20
     Button:
         text:"Cancelar busqueda"
-        on_press:root.manager.current="ridernoride"
+        on_press:
+            root.cancelRide()
+            root.manager.current="ridernoride"
         font_size:20
         pos_hint:{"center_x":0.5,"center_y":0.2}
         size_hint_x:None
@@ -314,7 +333,9 @@ WindowManager:
         size_hint_y:None
         width:300
         height:50
-        on_press:root.manager.current="ridernoride"
+        on_press:
+            root.cancelRide()
+            root.manager.current="ridernoride"
 
     Button:
         text: "Borrar este boton"
@@ -668,7 +689,3 @@ WindowManager:
         size:"400","500"
         source:"Fotos/PRICAR.jpg"
         pos_hint:{"center_x":0.5,"center_y":0.55}
-
-
-
-
