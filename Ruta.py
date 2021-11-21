@@ -1,6 +1,8 @@
+import webbrowser
+from Pasajero import *
 #importar las cosas de la api
-from main import Pricar
 
+pasa=Pasajero()
 class Ruta():
     #constructor
     def __init__(self):
@@ -13,12 +15,12 @@ class Ruta():
     def setPuntoInicial(self,punto):
         #define el punto inicial
         self.puntoInicial=punto
-        pass
+
 
     #setter del punto final de la ruta del conductor
     def setPuntoFinal(self,punto):
         self.puntoFinal=punto
-        pass
+
 
     #getter punto inicial
     def getPuntoInicial(self):
@@ -31,11 +33,11 @@ class Ruta():
 
     #metodo para crear la ruta que va a tener el conductor hacia el trabajo
     def crearRuta(self):
-        #ver como funciona la api y asi poder retornar la ruta
-        pass
+        url=("https://www.waze.com/ul?ll=",self.getPuntoFinal(),)
+        webbrowser.open("https://www.waze.com/ul?ll=6.20020215%2C-75.5784848084993&navigate=no&zoom=17&from=6.2657%2C-75.5682")
 
     #agrega una parada a la ruta del conductor para que pueda recoger a las personas
-    def agregarPara(self):
+    def agregarParada(self):
         """cuando el conductor acepta el viaje, se le debe de agregar una
         parada a la ruta."""
         pass
