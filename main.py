@@ -8,14 +8,15 @@ from kivymd.uix.screen import Screen
 from Vehiculo import Vehiculo
 from kivy.core.window import Window
 from Usuario import Usuario
+from Pasajero import *
 import mysql.connector
 mysqlcnx = mysql.connector.connect(user='root', password='Daviddegea22.',
                               host='127.0.0.1',
                               database='pricar',
                               autocommit=True)
 mysqlcursor=mysqlcnx.cursor()
-mysqlcursor.execute("select * from empleados;")
-mysqlresultado = mysqlcursor.fetchall()
+"""mysqlcursor.execute("select * from empleados;")
+mysqlresultado = mysqlcursor.fetchall()"""
 
 # import request
 api_file = open("Interfaz/API/aappii.txt", "r")
@@ -27,6 +28,13 @@ v = Vehiculo()
 
 #clase invocada
 us=Usuario()
+pas=Pasajero()
+
+
+
+#WINDOWMANAGER
+class WindowManager(ScreenManager):
+    pass
 
 
 
@@ -34,7 +42,6 @@ us=Usuario()
 """popup para avisar que hubo un error en el login"""
 class ErrorLogin(FloatLayout):
     pass
-
 """popup para editar perfil"""
 class EditPerfil(FloatLayout):
     def moveTo(self):
@@ -44,35 +51,14 @@ class EditPerfil(FloatLayout):
     def close(self):
         EditPerfil.exit()
 
-#SCREEN, SCREEN MANAGER, MAIN
-"""Clase de la pantalla del menu"""
-class MenuScreen(Screen):
-    def updateData(self):
-        #mysqlcursor.execute("select * from empleados where empleados.CodigoTrabajador=" + us.getCode()+ ";")
-        na = self.manager.get_screen("perfil")
-        na.ids.nameP.text = us.getName()
-        na.ids.mail.text = us.getMail()
-        na.ids.address.text = us.getAddress()
-        na.ids.cellphone.text = us.getCellphone()
-        na.ids.placa.text = us.getPlaca()
-        na.ids.carcap.text = str(us.getCarcap())
-        na.ids.point.text = str(us.getPoints())
 
-"""Clase de la pantalla del conductor"""
-class DriverScreen(Screen):
+
+#SCREEN, MAIN
+"""Pantalla predeterminada"""
+class Default(Screen):
     pass
-
-"""Clase de la pantalla del pasajero"""
-class RiderScreen(Screen):
-    pass
-
 
 """Clase de la pantalla de login"""
-
-
-
-
-
 class LogInScreen(Screen):
     user=ObjectProperty(None)
     password=ObjectProperty(None)
@@ -122,15 +108,39 @@ class LogInScreen(Screen):
                                  size_hint=(None, None), size=(350, 300))
         self.popupWindow.open()
 
+"""Clase de la pantalla del menu"""
+class MenuScreen(Screen):
+    def updateData(self):
+        #mysqlcursor.execute("select * from empleados where empleados.CodigoTrabajador=" + us.getCode()+ ";")
+        na = self.manager.get_screen("perfil")
+        na.ids.nameP.text = us.getName()
+        na.ids.mail.text = us.getMail()
+        na.ids.address.text = us.getAddress()
+        na.ids.cellphone.text = us.getCellphone()
+        na.ids.placa.text = us.getPlaca()
+        na.ids.carcap.text = str(us.getCarcap())
+        na.ids.point.text = str(us.getPoints())
+    def checkSearch(self):
+        mysqlcursor.execute("select ViajeEncontrado,BuscandoViajePasajero from empleados where empleados.CodigoTrabajador="+us.getCode()+";")
+        mysqlresultado = mysqlcursor.fetchall()
+        self.hayViaje=0
+        self.hayBusqueda=0
+        for x in mysqlresultado:
+            self.hayViaje=x[0]
+            self.hayBusqueda=x[1]
+        if self.hayViaje==0 and self.hayBusqueda==0:
+            kiv.current = "ridernoride"
+        elif self.hayViaje==0 and self.hayBusqueda==1:
+            kiv.current = "waitingfordriver"
+        elif self.hayViaje==1 and self.hayBusqueda==0:
+            kiv.current = "riderpicked"
+        else:
+            print("HAY UN ERRORRRRRR")
+            #SI PASA ESTO, VOLVER HAY ViajeEncontrado,BuscandoViajePasajero A FALSE
 
 """Clase de la pantalla de perfil"""
-
-
 class ProfileScreen(Screen):
     pass
-
-
-
 """Clase de la pantalla de editar perfil"""
 class EditProfileScreen(Screen):
     nameP=ObjectProperty(None)
@@ -156,36 +166,47 @@ class EditProfileScreen(Screen):
 
         print("se ha guardado correctamente")
 
-"""Pantalla predeterminada"""
-class Default(Screen):
+"""Clase de la pantalla del conductor"""
+class DriverScreen(Screen):
+    pass
+"""Clase para conductor sin pasasjero"""
+class DriverWNRScreen(Screen):
+    pass
+"""clase para conductor para ver el perfil del pasajero"""
+class DriverVPScreen(Screen):
     pass
 
+class DriverPPScreen(Screen):
+    pass
 """Clase de pantalla de pasajero"""
 class RiderProfileScreen(Screen):
     pass
 
-class DriverWNRScreen(Screen):
-    pass
-class DriverVPScreen(Screen):
-    pass
-class DriverPPScreen(Screen):
-    pass
+
+"""clase para pasasjero sin viaje ni busqueda"""
 class RiderWNRScreen(Screen):
-    pass
+    def paradaP(self):
+        pas.seleccionarParadaPred(us.getCode(),us.getAddress())
+    def paradaA(self):
+        pas.seleccionarParadaAc(us.getCode())
+"""clase para pasajero esperando al conductor"""
+class RiderWaitScreen(Screen):
+    def cancelRide(self):
+        # falta cancelarle el viaje al conductor
+        mysqlcursor.execute("update empleados set BuscandoViajePasajero=False where empleados.CodigoTrabajador="+us.getCode()+";")
+        mysqlcursor.execute("update empleados set ViajeEncontrado=False where empleados.CodigoTrabajador=" + us.getCode() + ";")
+        print("viaje cancelado")
+"""clase para pasajero buscando viaje"""
 class RiderPScreen(Screen):
-    pass
+    def cancelRide(self):
+        #falta cancelarle el viaje al conductor
+        mysqlcursor.execute("update empleados set BuscandoViajePasajero=False where empleados.CodigoTrabajador="+us.getCode()+";")
+        mysqlcursor.execute("update empleados set ViajeEncontrado=False where empleados.CodigoTrabajador=" + us.getCode() + ";")
+        print("viaje cancelado")
+"""clase para pasajero fin de viaje"""
 class RiderEndRScreen(Screen):
     pass
-class RiderWaitScreen(Screen):
-    pass
 
-
-
-
-
-#WINDOWMANAGER
-class WindowManager(ScreenManager):
-    pass
 kiv = Builder.load_file(("Interfaz/main.kv"))
 
 """MAIN"""
@@ -208,4 +229,5 @@ if __name__ == "__main__":
 
 
 mysqlcnx.close()
+
 
