@@ -1,4 +1,3 @@
-
 import mysql.connector
 mysqlcnx = mysql.connector.connect(user='root', password='Daviddegea22.',
                               host='127.0.0.1',
@@ -71,9 +70,6 @@ class Usuario():
         print (perfil)
         return perfil
 
-    #metodo para editar la direccion
-    def editarDireccion(self):
-        pass
     def editName(self,nombre):
         self.name=nombre
         mysqlcursor.execute('update empleados set Nombre= "'+nombre+'" where empleados.CodigoTrabajador='+self.code)
